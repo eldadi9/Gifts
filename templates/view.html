@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <img src="{{ url_for('static', filename='verifone-new-logo.jpg') }}" alt="Verifone Logo" class="logo">
+    <title>Employee Gift List</title>
+    <style>
+        body {
+            background-color: #00FFC0; /* Background color based on the logo */
+            font-family: Arial, sans-serif;
+            color: #000;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .logo {
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 150px; /* Adjust width as needed */
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="submit"] {
+            font-size: 1.2em;
+            padding: 10px;
+            margin: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 1.1em;
+        }
+        .received {
+            background-color: yellow;
+        }
+        .autocomplete-suggestions {
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 1000;
+            width: 200px;
+        }
+        .autocomplete-suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .highlighted {
+            background-color: #ffeb3b;
+        }
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Gift List</h1>
+
+        <form action="/view" method="get">
+            <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus>
+            <input type="submit" value="Search">
+            <div id="autocomplete-list" class="autocomplete-suggestions"></div>
+        </form>
+
+        <!-- New section for total gifts count -->
+        <div id="gift-counter" style="text-align: left; font-size: 1.2em; margin-top: 20px;">
+            סה"כ מתנות נלקחו: <span id="gift-count">0</span>
+        </div>
+
+        <table border="1" id="data-table">
+            <thead>
+                <tr>
+                    {% for header in headers %}
+                        <th>{{ header }}</th>
+                    {% endfor %}
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr class="data-row {% if row[-1] == 'Yes' %}received{% endif %}">
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                    <td>
+                        <form action="/mark_received" method="post">
+                            <input type="hidden" name="row_index" value="{{ loop.index0 }}">
+                            <input type="submit" value="קיבל מתנה">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button id="save-button">Save Changes</button>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="footer">
+            Creator: EG - Eldadg1@verifone.com
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('search-input').addEventListener('input', function() {
+            var query = this.value.trim();
+            if (query.length > 0) {
+                fetch('/autocomplete?query=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        var autocompleteList = document.getElementById('autocomplete-list');
+                        autocompleteList.innerHTML = '';
+                        data.forEach(function(item) {
+                            var suggestion = document.createElement('div');
+                            suggestion.textContent = item;
+                            suggestion.addEventListener('click', function() {
+                                autocompleteList.innerHTML = '';
+                                const lastName = item.split(' ').pop();
+                                document.getElementById('search-input').value = lastName;
+                                scrollToRow(lastName);
+                                revealFullTable();
+                            });
+                            autocompleteList.appendChild(suggestion);
+                        });
+                    });
+            } else {
+                document.getElementById('autocomplete-list').innerHTML = '';
+            }
+        });
+
+        function scrollToRow(lastName) {
+            var rows = document.querySelectorAll('.data-row');
+            let found = false;
+
+            rows.forEach(function(row) {
+                row.classList.remove('highlighted');
+            });
+
+            rows.forEach(function(row) {
+                var rowText = row.innerText.toLowerCase().trim();
+                var searchText = lastName.toLowerCase().trim();
+
+                if (rowText.includes(searchText)) {
+                    row.classList.add('highlighted');
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    found = true;
+                }
+            });
+
+            if (!found) {
+                alert("Name not found in the table");
+            }
+        }
+
+        document.querySelectorAll('form[action="/mark_received"]').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                setTimeout(function() {
+                    updateGiftCount();
+                    document.getElementById('search-input').focus();
+                }, 100);
+            });
+        });
+
+        function updateGiftCount() {
+            var receivedRows = document.querySelectorAll('.received');
+            var giftCountElement = document.getElementById('gift-count');
+            giftCountElement.textContent = receivedRows.length;
+        }
+
+        // Initial count update when the page loads
+        document.addEventListener('DOMContentLoaded', updateGiftCount);
+
+        function revealFullTable() {
+            var rows = document.querySelectorAll('.data-row');
+            rows.forEach(function(row) {
+                row.style.display = '';
+            });
+            document.getElementById('search-input').focus();
+        }
+
+        // Save the table data to a file
+        document.getElementById('save-button').addEventListener('click', function() {
+            var table = document.getElementById('data-table');
+            var rows = table.querySelectorAll('tr');
+            var csvContent = '';
+
+            rows.forEach(function(row) {
+                var cells = row.querySelectorAll('th, td');
+                var rowContent = [];
+                cells.forEach(function(cell) {
+                    rowContent.push(cell.textContent.trim());
+                });
+                csvContent += rowContent.join(',') + '\n';
+            });
+
+            // Create a downloadable CSV file
+            var blob = new Blob([csvContent], { type: 'text/csv' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'employee_gift_list.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
+
+
+    <script>
+        document.getElementById('search-input').addEventListener('input', function() {
+            var query = this.value.trim();
+            if (query.length > 0) {
+                fetch('/autocomplete?query=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        var autocompleteList = document.getElementById('autocomplete-list');
+                        autocompleteList.innerHTML = '';
+                        data.forEach(function(item) {
+                            var suggestion = document.createElement('div');
+                            suggestion.textContent = item;
+                            suggestion.addEventListener('click', function() {
+                                autocompleteList.innerHTML = '';
+                                const lastName = item.split(' ').pop();
+                                document.getElementById('search-input').value = lastName;
+                                scrollToRow(lastName);
+                                revealFullTable();
+                            });
+                            autocompleteList.appendChild(suggestion);
+                        });
+                    });
+            } else {
+                document.getElementById('autocomplete-list').innerHTML = '';
+            }
+        });
+
+        function scrollToRow(lastName) {
+            var rows = document.querySelectorAll('.data-row');
+            let found = false;
+
+            rows.forEach(function(row) {
+                row.classList.remove('highlighted');
+            });
+
+            rows.forEach(function(row) {
+                var rowText = row.innerText.toLowerCase().trim();
+                var searchText = lastName.toLowerCase().trim();
+
+                if (rowText.includes(searchText)) {
+                    row.classList.add('highlighted');
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    found = true;
+                }
+            });
+
+            if (!found) {
+                alert("Name not found in the table");
+            }
+        }
+
+        document.querySelectorAll('form[action="/mark_received"]').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                setTimeout(function() {
+                    updateGiftCount();
+                    document.getElementById('search-input').focus();
+                }, 100);
+            });
+        });
+
+        function updateGiftCount() {
+            var receivedRows = document.querySelectorAll('.received');
+            var giftCountElement = document.getElementById('gift-count');
+            giftCountElement.textContent = receivedRows.length;
+        }
+
+        // Initial count update when the page loads
+        document.addEventListener('DOMContentLoaded', updateGiftCount);
+
+        function revealFullTable() {
+            var rows = document.querySelectorAll('.data-row');
+            rows.forEach(function(row) {
+                row.style.display = '';
+            });
+            document.getElementById('search-input').focus();
+        }
+
+        // Save the table data to a file
+        document.getElementById('save-button').addEventListener('click', function() {
+            var table = document.getElementById('data-table');
+            var rows = table.querySelectorAll('tr');
+            var csvContent = '';
+
+            rows.forEach(function(row) {
+                var cells = row.querySelectorAll('th, td');
+                var rowContent = [];
+                cells.forEach(function(cell) {
+                    rowContent.push(cell.textContent.trim());
+                });
+                csvContent += rowContent.join(',') + '\n';
+            });
+
+            // Create a downloadable CSV file
+            var blob = new Blob([csvContent], { type: 'text/csv' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'employee_gift_list.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
