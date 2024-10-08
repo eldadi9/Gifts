@@ -26,12 +26,17 @@ def upload_file():
         flash('No selected file')
         return redirect(request.url)
     if file and file.filename.endswith('.xlsx'):
+        # בדיקת קיומה של התיקייה 'uploads' ויצירתה במידת הצורך
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])
+        
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         excel_data = pd.read_excel(filepath)
         return redirect(url_for('view_data'))
     flash('Invalid file format. Please upload an Excel file.')
     return redirect(url_for('index'))
+
 
 @app.route('/view')
 def view_data():
