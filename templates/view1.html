@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Gift List</title>
+    <style>
+        .received {
+            background-color: yellow;
+        }
+        .autocomplete-suggestions {
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 1000;
+            width: 200px;
+        }
+        .autocomplete-suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .highlighted {
+            background-color: #ffeb3b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee Gift List</h1>
+
+    <form action="/view" method="get">
+        <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus>
+        <input type="submit" value="Search">
+        <div id="autocomplete-list" class="autocomplete-suggestions"></div>
+    </form>
+
+    <table border="1" id="data-table">
+        <thead>
+            <tr>
+                <!-- Assuming headers will be dynamically populated -->
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Assuming rows will be dynamically populated -->
+            {% for row in rows %}
+            <tr class="data-row {% if row[-1] == 'Yes' %}received{% endif %}">
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+                <td>
+                    <form action="/mark_received" method="post">
+                        <input type="hidden" name="row_index" value="{{ loop.index0 }}">
+                        <input type="submit" value="קיבל מתנה">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Save Button -->
+    <button id="save-button">Save Changes</button>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <script>
+        document.getElementById('search-input').addEventListener('input', function() {
+            var query = this.value.trim();
+            if (query.length > 0) {
+                fetch('/autocomplete?query=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        var autocompleteList = document.getElementById('autocomplete-list');
+                        autocompleteList.innerHTML = '';
+                        data.forEach(function(item) {
+                            var suggestion = document.createElement('div');
+                            suggestion.textContent = item;
+                            suggestion.addEventListener('click', function() {
+                                autocompleteList.innerHTML = '';
+
+                                // Extract and set the last name in the search bar
+                                const lastName = item.split(' ').pop();
+                                document.getElementById('search-input').value = lastName;
+
+                                // Scroll to the row with the last name
+                                scrollToRow(lastName);
+
+                                // Reveal the full table after selection
+                                revealFullTable();
+                            });
+                            autocompleteList.appendChild(suggestion);
+                        });
+                    });
+            } else {
+                document.getElementById('autocomplete-list').innerHTML = '';
+            }
+        });
+
+        function scrollToRow(lastName) {
+            var rows = document.querySelectorAll('.data-row');
+            let found = false;
+
+            rows.forEach(function(row) {
+                row.classList.remove('highlighted');
+            });
+
+            rows.forEach(function(row) {
+                var rowText = row.innerText.toLowerCase().trim();
+                var searchText = lastName.toLowerCase().trim();
+
+                if (rowText.includes(searchText)) {
+                    row.classList.add('highlighted');
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    found = true;
+                }
+            });
+
+            if (!found) {
+                alert("Name not found in the table");
+            }
+        }
+
+        document.querySelectorAll('form[action="/mark_received"]').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                setTimeout(function() {
+                    document.getElementById('search-input').focus();
+                }, 100);
+            });
+        });
+
+        function revealFullTable() {
+            var rows = document.querySelectorAll('.data-row');
+            rows.forEach(function(row) {
+                row.style.display = '';
+            });
+            document.getElementById('search-input').focus();
+        }
+
+        // Save the table data to a file
+        document.getElementById('save-button').addEventListener('click', function() {
+            var table = document.getElementById('data-table');
+            var rows = table.querySelectorAll('tr');
+            var csvContent = '';
+
+            rows.forEach(function(row) {
+                var cells = row.querySelectorAll('th, td');
+                var rowContent = [];
+                cells.forEach(function(cell) {
+                    rowContent.push(cell.textContent.trim());
+                });
+                csvContent += rowContent.join(',') + '\n';
+            });
+
+            // Create a downloadable CSV file
+            var blob = new Blob([csvContent], { type: 'text/csv' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'employee_gift_list.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
