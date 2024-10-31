@@ -3,119 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <style>
-    body {
-        background-color: #00FFC0;
-        font-family: Arial, sans-serif;
-        color: #000;
-        text-align: center;
-        margin: 0;
-        padding: 0;
-    }
-    .header {
-        background-color: #00FFC0;
-        padding: 10px 0;
-    }
-    .logo {
-        width: 300px; /* קטן יותר מהמקורי */
-        display: block;
-        margin: 0 auto;
-    }
-    .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 15px;
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 4px 50px rgba(0, 0, 0, 0.2);
-    }
-    h1 {
-        font-size: 2.5em; /* קטן יותר מהמקורי להתאמה טובה יותר */
-        margin: 10px 0;
-    }
-    input[type="text"], input[type="submit"], button {
-        font-size: 16px; /* מותאם למסכים קטנים */
-        padding: 10px;
-        margin: 10px;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-    th, td {
-        border: 1px solid #000;
-        padding: 8px; /* פחות מהמקורי להתאמה טובה יותר */
-        font-size: 1.2em; /* קטן יותר מהמקורי */
-    }
-    .received {
-        background-color: yellow;
-    }
-    .autocomplete-suggestions {
-        border: 1px solid #e0e0e0;
-        background-color: #ffffff;
-        max-height: 150px;
-        overflow-y: auto;
-        position: absolute;
-        z-index: 1000;
-        width: 200px;
-    }
-    .autocomplete-suggestions div {
-        padding: 10px;
-        cursor: pointer;
-    }
-    .autocomplete-suggestions div:hover {
-        background-color: #f0f0f0;
-    }
-    .highlighted {
-        background-color: #ffeb3b;
-    }
-    .footer {
-        margin-top: 25px;
-        font-size: 1.4em;
-        color: #555;
-    }
-    @media (max-width: 600px) {
-    .header, .container {
-        width: 100%;
-        padding: 5px;
-        box-shadow: none; /* הסרת צללים לפשט תצוגה */
-    }
-    .logo {
-        width: 60%; /* תופס פחות מקום */
-    }
-         h1 {
-        font-size: 1.5em; /* קטן יותר מבטלפון */
-    }
-    input[type="text"], input[type="submit"], button {
-        font-size: 14px;
-        padding: 8px;
-        margin: 5px 0; /* רווח נמוך יותר על כל האלמנטים */
-        width: auto; /* עוזר להימנע מעימוד לא נכון */
-    }
-	.footer {
-        font-size: 1em;
-    }
-    form {
-        flex-direction: column; /* מסדר את האלמנטים בטור במקום בשורה */
-        align-items: center;
-    }
-    table {
-        font-size: 0.9em; /* פונט קטן יותר לטבלה */
-    }
-        th, td {
-        padding: 5px; /* פחות רווח בתאים */
-    }
-    }
-    @media (max-width: 600px) {
+    <style>
+        body {
+            background-color: #00FFC0;
+            font-family: Arial, sans-serif;
+            color: #000;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #00FFC0;
+            padding: 10px 0;
+        }
         .logo {
-            width: 70%; /* מותאם לקטנים יותר */
+            width: 60%;
+            display: block;
+            margin: 10px auto;
         }
-        .container, .header {
-            box-shadow: none;
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 50px rgba(0, 0, 0, 0.2);
         }
-    }
-</style>
+        h1 {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+        input[type="text"], input[type="submit"], button {
+            font-size: 16px;
+            padding: 12px;
+            margin: 10px auto;
+            display: block;
+            width: 90%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 1.2em;
+        }
+        .received {
+            background-color: yellow;
+        }
+        .autocomplete-suggestions {
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 1000;
+            width: 90%;
+            left: 5%; /* Centers the dropdown */
+            right: 5%;
+        }
+        .autocomplete-suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .highlighted {
+            background-color: #ffeb3b;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 1.4em;
+            color: #555;
+        }
+        @media (max-width: 600px) {
+            .header, .container {
+                width: 100%;
+                padding: 5px;
+                box-shadow: none;
+            }
+            .footer {
+                font-size: 1em;
+            }
+            .logo {
+                width: 70%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -123,19 +100,15 @@
     </div>
     <div class="container">
         <h1>Employee Gift List</h1>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <form action="/view" method="get" style="flex-grow: 1;">
-                <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus>
-                <input type="submit" value="Search">
-                <div id="autocomplete-list" class="autocomplete-suggestions"></div>
-            </form>
-            <div id="total-received" style="padding: 15px; border: 2px solid #000; border-radius: 5px;font-size: 20px;">
+        <form action="/view" method="get" style="margin: 0 auto; width: 90%;">
+            <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus>
+            <input type="submit" value="Search">
+            <div id="total-received" style="margin-top: 10px;">
                 סה"כ מתנות התקבלו: {{ total_received }}
             </div>
-            <form action="/save" method="post">
-                <button type="submit" id="save-button">Save Excel</button>
-            </form>
-        </div>
+            <button type="submit" id="save-button" style="margin-top: 10px;">Save Excel</button>
+            <div id="autocomplete-list" class="autocomplete-suggestions"></div>
+        </form>
         <table border="1" id="data-table">
             <thead>
                 <tr>
@@ -155,7 +128,7 @@
                         <form action="/mark_received" method="post">
                             <input type="hidden" name="row_index" value="{{ loop.index0 }}">
                             <input type="submit" value="קיבל מתנה">
-                        </form
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -166,52 +139,50 @@
         </div>
     </div>
     <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var searchInput = document.getElementById('search-input');
-
-    searchInput.addEventListener('input', function () {
-        var query = this.value.trim();
-        if (query.length > 0) {
-            fetch('/autocomplete?query=' + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
-                    var autocompleteList = document.getElementById('autocomplete-list');
-                    autocompleteList.innerHTML = '';
-                    data.forEach(function (item) {
-                        var suggestion = document.createElement('div');
-                        suggestion.textContent = item;
-                        suggestion.addEventListener('click', function () {
-                            selectSuggestion(item);
+        document.addEventListener('DOMContentLoaded', function () {
+            var searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function () {
+                var query = this.value.trim();
+                if (query.length > 0) {
+                    fetch('/autocomplete?query=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(data => {
+                            var autocompleteList = document.getElementById('autocomplete-list');
+                            autocompleteList.innerHTML = '';
+                            data.forEach(function (item) {
+                                var suggestion = document.createElement('div');
+                                suggestion.textContent = item;
+                                suggestion.addEventListener('click', function () {
+                                    selectSuggestion(item);
+                                });
+                                autocompleteList.appendChild(suggestion);
+                            });
                         });
-                        autocompleteList.appendChild(suggestion);
-                    });
+                } else {
+                    document.getElementById('autocomplete-list').innerHTML = '';
+                }
+            });
+
+            function selectSuggestion(item) {
+                searchInput.value = item;
+                scrollToExactRow(item);
+                document.getElementById('autocomplete-list').innerHTML = '';
+            }
+
+            function scrollToExactRow(fullName) {
+                var rows = document.querySelectorAll('#data-table tbody tr');
+                rows.forEach(row => {
+                    row.classList.remove('highlighted');
                 });
-        } else {
-            document.getElementById('autocomplete-list').innerHTML = '';
-        }
-    });
-
-    function selectSuggestion(item) {
-        searchInput.value = item;
-        scrollToExactRow(item);
-        document.getElementById('autocomplete-list').innerHTML = '';
-    }
-
-    function scrollToExactRow(fullName) {
-        var rows = document.querySelectorAll('#data-table tbody tr');
-        rows.forEach(row => {
-            row.classList.remove('highlighted');
-        });
-        rows.forEach(row => {
-            var rowFullName = row.cells[0].textContent + ' ' + row.cells[1].textContent;
-            if (rowFullName.trim() === fullName.trim()) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                row.classList.add('highlighted');
+                rows.forEach(row => {
+                    var rowFullName = row.cells[0].textContent + ' ' + row.cells[1].textContent;
+                    if (rowFullName.trim() === fullName.trim()) {
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        row.classList.add('highlighted');
+                    }
+                });
             }
         });
-    }
-});
-
     </script>
 </body>
 </html>
