@@ -78,10 +78,11 @@ def autocomplete():
         excel_data.apply(lambda row: all(term in row['First Name'] or term in row['Last Name'] for term in search_terms), axis=1)
     ]
 
-    # Create full names and return them as a list
-    names = (matching_names['First Name'] + ' ' + matching_names['Last Name']).tolist()
+    # Create full names with Last Name first and return them as a list
+    names = (matching_names['Last Name'] + ' ' + matching_names['First Name']).tolist()
 
     return jsonify(names)
+
 
 @app.route('/mark_received', methods=['POST'])
 def mark_received():
