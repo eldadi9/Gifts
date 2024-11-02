@@ -39,7 +39,6 @@ def upload_file():
     flash('Invalid file format. Please upload an Excel file.')
     return redirect(url_for('index'))
 
-
 @app.route('/view')
 def view_data():
     global excel_data
@@ -53,15 +52,20 @@ def view_data():
         filtered_data = excel_data[
             excel_data.apply(lambda row: all(term in row['First Name'].lower() or term in row['Last Name'].lower() for term in search_terms), axis=1)
         ]
+        row_indices = filtered_data.index.tolist()
     else:
         filtered_data = excel_data
+        row_indices = filtered_data.index.tolist()
 
     headers = filtered_data.columns.tolist()
     rows = filtered_data.values.tolist()
 
+    # Combine rows and indices
+    rows_with_indices = [{'data': row, 'index': idx} for row, idx in zip(rows, row_indices)]
+
     total_received = (excel_data['Received'] == 'Yes').sum() if 'Received' in excel_data.columns else 0
 
-    return render_template('view.html', headers=headers, rows=rows, search_query=search_query, total_received=total_received)
+    return render_template('view.html', headers=headers, rows=rows_with_indices, search_query=search_query, total_received=total_received)
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
@@ -72,24 +76,19 @@ def autocomplete():
     search_query = request.args.get('query', '').lower()
     search_terms = search_query.split()
 
-    # Ensure columns exist to avoid KeyError
     if 'First Name' not in excel_data.columns or 'Last Name' not in excel_data.columns:
         return jsonify([])
 
-    # Convert columns to lowercase for case-insensitive matching
     excel_data['First Name'] = excel_data['First Name'].astype(str).str.lower()
     excel_data['Last Name'] = excel_data['Last Name'].astype(str).str.lower()
 
-    # Find matching names using vectorized operations
     matching_names = excel_data[
         excel_data.apply(lambda row: all(term in row['First Name'] or term in row['Last Name'] for term in search_terms), axis=1)
     ]
 
-    # Create full names with Last Name first and return them as a list
     names = (matching_names['Last Name'] + ' ' + matching_names['First Name']).tolist()
 
     return jsonify(names)
-
 
 @app.route('/mark_received', methods=['POST'])
 def mark_received():
