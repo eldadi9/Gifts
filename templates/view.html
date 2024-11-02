@@ -130,7 +130,7 @@
         <h1>Employee Gift List</h1>
         <div style="display: flex; flex-direction: column; align-items: center;">
             <form action="/view" method="get" style="width: 100%;">
-                <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus>
+                <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus autocomplete="new-password">
                 <input type="submit" value="Search">
                 <div id="autocomplete-list" class="autocomplete-suggestions"></div>
             </form>
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var rowFullName = row.cells[0].textContent + ' ' + row.cells[1].textContent;
             if (rowFullName.trim() === fullName.trim()) {
                 row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                row.classList.add('highlighted');
+                row.classList add('highlighted');
             }
         });
     }
