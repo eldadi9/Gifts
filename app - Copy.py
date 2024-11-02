@@ -29,9 +29,16 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         excel_data = pd.read_excel(filepath)
+
+        # Convert relevant columns to lowercase immediately after loading
+        if 'First Name' in excel_data.columns and 'Last Name' in excel_data.columns:
+            excel_data['First Name'] = excel_data['First Name'].astype(str).str.lower()
+            excel_data['Last Name'] = excel_data['Last Name'].astype(str).str.lower()
+
         return redirect(url_for('view_data'))
     flash('Invalid file format. Please upload an Excel file.')
     return redirect(url_for('index'))
+
 
 @app.route('/view')
 def view_data():
