@@ -3,125 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <style>
-    body {
-        background-color: #67eec5;
-        font-family: Arial, sans-serif;
-        color: #000;
-        text-align: center;
-        margin: 0;
-        padding: 0;
-    }
-    .header {
-        background-color: #67eec5;
-        padding: 10px 0;
-    }
-    .logo {
-        width: 300px;
-        display: block;
-        margin: 0 auto;
-    }
-    .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 15px;
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 4px 50px rgba(0, 0, 0, 0.2);
-    }
-    h1 {
-        font-size: 2.5em;
-        margin: 10px 0;
-    }
-    input[type="text"], input[type="submit"], button {
-        font-size: 16px;
-        padding: 10px;
-        margin: 10px;
-        width: calc(100% - 40px); /* תוקן כדי להתאים לרוחב האם */
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-    th, td {
-        border: 1px solid #000;
-        padding: 8px;
-        font-size: 1.2em;
-    }
-    .received {
-        background-color: yellow;
-    }
-    .autocomplete-suggestions {
-        border: 1px solid #e0e0e0;
-        background-color: #ffffff;
-        max-height: 150px;
-        overflow-y: auto;
-        position: absolute;
-        z-index: 1000;
-        width: calc(100% - 40px); /* תוקן כדי להתאים לרוחב האם */
-    }
-    .autocomplete-suggestions div {
-        padding: 10px;
-        cursor: pointer;
-    }
-    .autocomplete-suggestions div:hover {
-        background-color: #f0f0f0;
-    }
-    .highlighted {
-        background-color: #ffeb3b;
-    }
-    .footer {
-        margin-top: 25px;
-        font-size: 1.4em;
-        color: #555;
-    }
-    @media (max-width: 600px) {
-        .header, .container {
-            width: 100%;
-            padding: 5px;
-            box-shadow: none;
+    <style>
+        body {
+            background-color: #67eec5;
+            font-family: Arial, sans-serif;
+            color: #000;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #67eec5;
+            padding: 10px 0;
         }
         .logo {
-            width: 70%;
+            width: 300px;
+            display: block;
+            margin: 0 auto;
         }
-        .container, .header {
-            box-shadow: none;
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 50px rgba(0, 0, 0, 0.2);
         }
         h1 {
-            font-size: 1.5em;
+            font-size: 2.5em;
+            margin: 10px 0;
         }
         input[type="text"], input[type="submit"], button {
-            font-size: 14px;
-            padding: 8px;
-            margin: 5px 0;
-            width: auto;
-        }
-        .footer {
-            font-size: 1em;
-        }
-        form {
-            flex-direction: column;
-            align-items: center;
+            font-size: 16px;
+            padding: 10px;
+            margin: 10px;
+            width: calc(100% - 40px);
         }
         table {
-            font-size: 0.9em;
-        }
-        th, td {
-            padding: 5px;
-        }
-        #total-received {
             width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
         }
-        #save-button {
-            width: 100%;
-            padding: 15px;
-            font-size: 20px;
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 1.2em;
         }
-    }
-</style>
-
+        .received {
+            background-color: yellow;
+        }
+        .autocomplete-suggestions {
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 1000;
+            width: calc(100% - 40px);
+        }
+        .autocomplete-suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .highlighted {
+            background-color: #ffeb3b;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 1.4em;
+            color: #555;
+        }
+        @media (max-width: 600px) {
+            .header, .container {
+                width: 100%;
+                padding: 5px;
+                box-shadow: none;
+            }
+            .logo {
+                width: 70%;
+            }
+            .container, .header {
+                box-shadow: none;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            input[type="text"], input[type="submit"], button {
+                font-size: 14px;
+                padding: 8px;
+                margin: 5px 0;
+                width: auto;
+            }
+            .footer {
+                font-size: 1em;
+            }
+            form {
+                flex-direction: column;
+                align-items: center;
+            }
+            table {
+                font-size: 0.9em;
+            }
+            th, td {
+                padding: 5px;
+            }
+            #total-received {
+                width: 100%;
+                margin-top: 20px;
+            }
+            #save-button {
+                width: 100%;
+                padding: 15px;
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -153,16 +152,16 @@
             </thead>
             <tbody>
                 {% for row in rows %}
-                <tr class="data-row {% if row[-1] == 'Yes' %}received{% endif %}">
-                    {% for item in row %}
+                <tr class="data-row {% if 'Received' in headers and row.data[headers.index('Received')] == 'Yes' %}received{% endif %}">
+                    {% for item in row.data %}
                         <td>{{ item }}</td>
                     {% endfor %}
                     <td>
                         <form action="/mark_received" method="post">
-                            <input type="hidden" name="row_index" value="{{ loop.index0 }}">
+                            <input type="hidden" name="row_index" value="{{ row.index }}">
                             <input type="submit" value="קיבל מתנה">
-                        </form
-                    </td>
+                        </form>
+                    </td
                 </tr>
                 {% endfor %}
             </tbody>
@@ -177,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     searchInput.addEventListener('input', function () {
         var query = this.value.trim();
-        if (query.length > 0) {
+        if (query.length > 0) {  // Make sure query length is greater than 0
             fetch('/autocomplete?query=' + encodeURIComponent(query))
                 .then(response => response.json())
                 .then(data => {
@@ -216,8 +215,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    adjustTableCells(); // Call the function to adjust the table cells on load
 });
 
+// Function to adjust the display of table cells to replace 'nan' with 'NO'
+function adjustTableCells() {
+    const cells = document.querySelectorAll('#data-table td');
+    cells.forEach(cell => {
+        if (cell.textContent.trim().toLowerCase() === 'nan') {
+            cell.textContent = 'No';  // Change 'Not Received' to 'No' as per your request
+        }
+    });
+}
     </script>
 </body>
 </html>
