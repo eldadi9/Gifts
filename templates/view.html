@@ -120,6 +120,21 @@
                 font-size: 20px;
             }
         }
+        /* עיצובים חדשים לכפתורים ועמודות */
+        .large-button {
+            padding: 10px 20px; /* גדול יותר */
+            font-size: 16px;
+        }
+        .small-button {
+            padding: 5px 10px; /* קטן יותר */
+            font-size: 12px;
+        }
+        .wide {
+            width: 20%; /* רוחב רחב יותר לעמודת Action */
+        }
+        .narrow {
+            width: 10%; /* רוחב צר יותר לעמודת Taken By */
+        }
     </style>
 </head>
 <body>
@@ -147,7 +162,8 @@
                     {% for header in headers %}
                         <th>{{ header }}</th>
                     {% endfor %}
-                    <th>Action</th>
+                    <th class="wide">Action</th>
+                    <th class="narrow">Taken By</th>
                 </tr>
             </thead>
             <tbody>
@@ -159,9 +175,20 @@
                     <td>
                         <form action="/mark_received" method="post">
                             <input type="hidden" name="row_index" value="{{ row.index }}">
-                            <input type="submit" value="קיבל מתנה">
+                            <button type="submit" class="large-button">קיבל מתנה</button>
                         </form>
-                    </td
+                    </td>
+                    <td>
+                        {% if row.data[headers.index('Taken By')] %}
+                            {{ row.data[headers.index('Taken By')] }}
+                        {% else %}
+                            <form action="/mark_taken" method="post">
+                                <input type="hidden" name="row_index" value="{{ row.index }}">
+                                <input type="text" name="taken_by" placeholder="Enter name" class="autocomplete">
+                                <button type="submit" class="small-button">נלקח על ידי</button>
+                            </form>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -171,63 +198,63 @@
         </div>
     </div>
     <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var searchInput = document.getElementById('search-input');
+        document.addEventListener('DOMContentLoaded', function () {
+            var searchInput = document.getElementById('search-input');
 
-    searchInput.addEventListener('input', function () {
-        var query = this.value.trim();
-        if (query.length > 0) {  // Make sure query length is greater than 0
-            fetch('/autocomplete?query=' + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
-                    var autocompleteList = document.getElementById('autocomplete-list');
-                    autocompleteList.innerHTML = '';
-                    data.forEach(function (item) {
-                        var suggestion = document.createElement('div');
-                        suggestion.textContent = item;
-                        suggestion.addEventListener('click', function () {
-                            selectSuggestion(item);
+            searchInput.addEventListener('input', function () {
+                var query = this.value.trim();
+                if (query.length > 0) {
+                    fetch('/autocomplete?query=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(data => {
+                            var autocompleteList = document.getElementById('autocomplete-list');
+                            autocompleteList.innerHTML = '';
+                            data.forEach(function (item) {
+                                var suggestion = document.createElement('div');
+                                suggestion.textContent = item;
+                                suggestion.addEventListener('click', function () {
+                                    selectSuggestion(item);
+                                });
+                                autocompleteList.appendChild(suggestion);
+                            });
                         });
-                        autocompleteList.appendChild(suggestion);
-                    });
-                });
-        } else {
-            document.getElementById('autocomplete-list').innerHTML = '';
-        }
-    });
+                } else {
+                    document.getElementById('autocomplete-list').innerHTML = '';
+                }
+            });
 
-    function selectSuggestion(item) {
-        searchInput.value = item;
-        scrollToExactRow(item);
-        document.getElementById('autocomplete-list').innerHTML = '';
-    }
-
-    function scrollToExactRow(fullName) {
-        var rows = document.querySelectorAll('#data-table tbody tr');
-        rows.forEach(row => {
-            row.classList.remove('highlighted');
-        });
-        rows.forEach(row => {
-            var rowFullName = row.cells[0].textContent + ' ' + row.cells[1].textContent;
-            if (rowFullName.trim() === fullName.trim()) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                row.classList.add('highlighted');
+            function selectSuggestion(item) {
+                searchInput.value = item;
+                scrollToExactRow(item);
+                document.getElementById('autocomplete-list').innerHTML = '';
             }
+
+            function scrollToExactRow(fullName) {
+                var rows = document.querySelectorAll('#data-table tbody tr');
+                rows.forEach(row => {
+                    row.classList.remove('highlighted');
+                });
+                rows.forEach(row => {
+                    var rowFullName = row.cells[0].textContent + ' ' + row.cells[1].textContent;
+                    if (rowFullName.trim() === fullName.trim()) {
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        row.classList.add('highlighted');
+                    }
+                });
+            }
+
+            adjustTableCells();
         });
-    }
 
-    adjustTableCells(); // Call the function to adjust the table cells on load
-});
-
-// Function to adjust the display of table cells to replace 'nan' with 'NO'
-function adjustTableCells() {
-    const cells = document.querySelectorAll('#data-table td');
-    cells.forEach(cell => {
-        if (cell.textContent.trim().toLowerCase() === 'nan') {
-            cell.textContent = 'No';  // Change 'Not Received' to 'No' as per your request
+        function adjustTableCells() {
+            const cells = document.querySelectorAll('#data-table td');
+            cells.forEach(cell => {
+                if (cell.textContent.trim().toLowerCase() === 'nan') {
+                    cell.textContent = 'No';
+                }
+            });
         }
-    });
-}
     </script>
 </body>
 </html>
+

@@ -30,7 +30,11 @@ def upload_file():
         file.save(filepath)
         excel_data = pd.read_excel(filepath)
 
-        # Convert relevant columns to lowercase immediately after loading
+        # ודא שהעמודה 'Taken By' קיימת
+        if 'Taken By' not in excel_data.columns:
+            excel_data['Taken By'] = [None] * len(excel_data)
+
+        # המרת עמודות רלוונטיות לאותיות קטנות מיד לאחר הטעינה
         if 'First Name' in excel_data.columns and 'Last Name' in excel_data.columns:
             excel_data['First Name'] = excel_data['First Name'].astype(str).str.lower()
             excel_data['Last Name'] = excel_data['Last Name'].astype(str).str.lower()
@@ -38,6 +42,7 @@ def upload_file():
         return redirect(url_for('view_data'))
     flash('Invalid file format. Please upload an Excel file.')
     return redirect(url_for('index'))
+
 
 @app.route('/view')
 def view_data():
@@ -66,6 +71,22 @@ def view_data():
     total_received = (excel_data['Received'] == 'Yes').sum() if 'Received' in excel_data.columns else 0
 
     return render_template('view.html', headers=headers, rows=rows_with_indices, search_query=search_query, total_received=total_received)
+
+# New functionality for handling the "Taken By" action
+@app.route('/mark_taken', methods=['POST'])
+@app.route('/mark_taken', methods=['POST'])
+def mark_taken():
+    global excel_data
+    row_index = int(request.form['row_index'])
+    taken_by = request.form['taken_by']
+    if 'Taken By' in excel_data.columns and 'Received' in excel_data.columns:
+        excel_data.at[row_index, 'Taken By'] = taken_by
+        excel_data.at[row_index, 'Received'] = 'Yes'  # Updating the status to 'Yes'
+        return redirect(url_for('view_data'))
+    else:
+        flash('Error: Missing necessary columns in data.')
+    return redirect(url_for('view_data'))
+
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
