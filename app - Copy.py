@@ -29,6 +29,12 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         excel_data = pd.read_excel(filepath)
+
+        # Convert relevant columns to lowercase immediately after loading
+        if 'First Name' in excel_data.columns and 'Last Name' in excel_data.columns:
+            excel_data['First Name'] = excel_data['First Name'].astype(str).str.lower()
+            excel_data['Last Name'] = excel_data['Last Name'].astype(str).str.lower()
+
         return redirect(url_for('view_data'))
     flash('Invalid file format. Please upload an Excel file.')
     return redirect(url_for('index'))
@@ -46,15 +52,20 @@ def view_data():
         filtered_data = excel_data[
             excel_data.apply(lambda row: all(term in row['First Name'].lower() or term in row['Last Name'].lower() for term in search_terms), axis=1)
         ]
+        row_indices = filtered_data.index.tolist()
     else:
         filtered_data = excel_data
+        row_indices = filtered_data.index.tolist()
 
     headers = filtered_data.columns.tolist()
     rows = filtered_data.values.tolist()
 
+    # Combine rows and indices
+    rows_with_indices = [{'data': row, 'index': idx} for row, idx in zip(rows, row_indices)]
+
     total_received = (excel_data['Received'] == 'Yes').sum() if 'Received' in excel_data.columns else 0
 
-    return render_template('view.html', headers=headers, rows=rows, search_query=search_query, total_received=total_received)
+    return render_template('view.html', headers=headers, rows=rows_with_indices, search_query=search_query, total_received=total_received)
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
@@ -65,21 +76,17 @@ def autocomplete():
     search_query = request.args.get('query', '').lower()
     search_terms = search_query.split()
 
-    # Ensure columns exist to avoid KeyError
     if 'First Name' not in excel_data.columns or 'Last Name' not in excel_data.columns:
         return jsonify([])
 
-    # Convert columns to lowercase for case-insensitive matching
     excel_data['First Name'] = excel_data['First Name'].astype(str).str.lower()
     excel_data['Last Name'] = excel_data['Last Name'].astype(str).str.lower()
 
-    # Find matching names using vectorized operations
     matching_names = excel_data[
         excel_data.apply(lambda row: all(term in row['First Name'] or term in row['Last Name'] for term in search_terms), axis=1)
     ]
 
-    # Create full names and return them as a list
-    names = (matching_names['First Name'] + ' ' + matching_names['Last Name']).tolist()
+    names = (matching_names['Last Name'] + ' ' + matching_names['First Name']).tolist()
 
     return jsonify(names)
 
@@ -99,6 +106,32 @@ def mark_received():
     else:
         excel_data.at[row_index, 'Received'] = 'Yes'
         flash(f"{excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} marked as received.")
+
+    return redirect(url_for('view_data'))
+
+@app.route('/mark_taken', methods=['POST'])
+def mark_taken():
+    global excel_data
+    if excel_data is None:
+        flash('No file uploaded.')
+        return redirect(url_for('index'))
+
+    row_index = int(request.form['row_index'])
+    taken_by = request.form['taken_by']  # השם שהוזן
+
+    # הוספת עמודת 'Taken By' במידת הצורך
+    if 'Taken By' not in excel_data.columns:
+        excel_data['Taken By'] = ''
+
+    if 'Received' not in excel_data.columns:
+        excel_data['Received'] = ''
+
+    if excel_data.at[row_index, 'Received'] == 'Yes':
+        flash(f"Error: {excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} already received a gift.")
+    else:
+        excel_data.at[row_index, 'Received'] = 'Yes'
+        excel_data.at[row_index, 'Taken By'] = taken_by  # שמירת השם
+        flash(f"{excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} marked as taken by {taken_by}.")
 
     return redirect(url_for('view_data'))
 
