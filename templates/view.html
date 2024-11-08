@@ -107,7 +107,7 @@
                 font-size: 10px;
                 padding: 2px;
                 margin: 3px;
-                width: 60%; /* הכפתורים ימלאו את הרוחב במובייל */
+                width: 65%; /* הכפתורים ימלאו את הרוחב במובייל */
 				box-sizing: border-box;
             }
             #data-table th, #data-table td {
@@ -156,7 +156,7 @@
             <div class="action-buttons">
                 <form action="/mark_received" method="post" style="display: inline;">
                     <input type="hidden" name="row_index" value="{{ row.index }}">
-                    <input type="submit" value="קיבל מתנה" style="padding: 4px 6px; font-size: 0.8em;">
+                    <input type="submit" value="קיבל מתנה" style="padding: 1px 2px; font-size: 0.8em;">
                 </form>
                 <form action="/mark_taken" method="post" style="display: inline;">
                     <input type="hidden" name="row_index" value="{{ row.index }}">
