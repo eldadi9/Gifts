@@ -23,20 +23,20 @@
             margin: 0 auto;
         }
         .container {
-            max-width: 90%;
+            max-width: 80%;
             margin: auto;
             padding: 15px;
             background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 70px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.85);
         }
         h1 {
-            font-size: 2em;
-            margin: 10px 0;
+            font-size: 5em;
+            margin: 7px 0;
         }
         input[type="text"], input[type="submit"], button {
-            font-size: 14px;
-            padding: 5px; /* ריווח פנימי */
+            font-size: 18px;
+            padding: 4px; /* ריווח פנימי */
             margin: 2px;
             box-sizing: border-box;
         }
@@ -44,12 +44,14 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
-            table-layout: fixed;
+            table-layout: auto;
+			box-sizing: border-box;
+			word-wrap: break-word;
         }
         th, td {
             border: 1px solid #000;
-            padding: 6px; /* הקטנת גובה תא */
-            font-size: 1.1em; /* הגדלת פונט */
+            padding: 8px; /* הקטנת גובה תא */
+            font-size: 1.4em; /* הגדלת פונט */
             text-align: center;
             overflow: hidden;
             white-space: nowrap;
@@ -62,19 +64,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
         }
         .autocomplete-suggestions {
             border: 1px solid #e0e0e0;
-            background-color: #ffffff;
-            max-height: 150px;
+            background-color: #67eec5;
+            max-height: 200px;
             overflow-y: auto;
             position: absolute;
             z-index: 1000;
-            width: calc(100% - 40px);
+            width: calc(60% - 40px);
         }
         .autocomplete-suggestions div {
-            padding: 10px;
+            padding: 8px;
             cursor: pointer;
         }
         .autocomplete-suggestions div:hover {
@@ -85,31 +87,32 @@
         }
         .footer {
             margin-top: 20px;
-            font-size: 1em;
+            font-size: 1.5em;
             color: #555;
         }
         /* עיצוב רספונסיבי למסכים קטנים */
         @media (max-width: 600px) {
             .container {
-                width: 95%;
-                padding: 5px;
+                width: 100%;
+                padding: 3px;
                 box-shadow: none;
             }
             .logo {
                 width: 60%;
             }
             h1 {
-                font-size: 1.5em;
+                font-size: 1.3em;
             }
             input[type="text"], input[type="submit"], button {
-                font-size: 12px;
-                padding: 6px;
+                font-size: 10px;
+                padding: 5px;
                 margin: 3px;
-                width: 100%; /* הכפתורים ימלאו את הרוחב במובייל */
+                width: 90%; /* הכפתורים ימלאו את הרוחב במובייל */
+				box-sizing: border-box;
             }
             #data-table th, #data-table td {
                 font-size: 1em;
-                padding: 8px;
+                padding: 7px;
             }
             .footer {
                 font-size: 0.8em;
