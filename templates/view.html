@@ -93,7 +93,7 @@
         /* עיצוב רספונסיבי למסכים קטנים */
         @media (max-width: 600px) {
             .container {
-                width: 100%;
+                width: 80%;
                 padding: 3px;
                 box-shadow: none;
             }
@@ -105,7 +105,7 @@
             }
             input[type="text"], input[type="submit"], button {
                 font-size: 10px;
-                padding: 5px;
+                padding: 3px;
                 margin: 3px;
                 width: 90%; /* הכפתורים ימלאו את הרוחב במובייל */
 				box-sizing: border-box;
@@ -160,8 +160,8 @@
                 </form>
                 <form action="/mark_taken" method="post" style="display: inline;">
                     <input type="hidden" name="row_index" value="{{ row.index }}">
-                    <input type="text" name="taken_by" placeholder=" הכנס שם עובד" style="width: 200px; padding: 4px; font-size: 0.8em;">
-                    <button type="submit" style="padding: 4px 8px; font-size: 0.8em;">נלקח על ידי</button>
+                    <input type="text" name="taken_by" placeholder=" הכנס שם עובד" style="width: 150px; padding: 4px; font-size: 0.8em;">
+                    <button type="submit" style="padding: 3px 5px; font-size: 0.8em;">נלקח על ידי</button>
                 </form>
             </div>
         </td>
