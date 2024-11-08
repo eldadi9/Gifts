@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* General Styles */
+        /* סגנונות CSS */
         body {
             background-color: #67eec5;
             font-family: Arial, sans-serif;
@@ -13,105 +13,87 @@
             margin: 0;
             padding: 0;
         }
-
         .header {
+            background-color: #67eec5;
             padding: 10px 0;
         }
-
         .logo {
-            width: 150px;
+            width: 200px;
             display: block;
             margin: 0 auto;
         }
-
         .container {
-            max-width: 700px;
+            max-width: 90%;
             margin: auto;
             padding: 15px;
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
         }
-
         h1 {
             font-size: 2em;
             margin: 10px 0;
         }
-
-        /* Top Section Styling */
-        .top-section input[type="text"],
-        .top-section input[type="submit"],
-        .top-section button {
-            width: 100%;
-            padding: 10px;
-            font-size: 1em;
-            margin-bottom: 5px;
+        input[type="text"], input[type="submit"], button {
+            font-size: 14px;
+            padding: 5px; /* ריווח פנימי */
+            margin: 2px;
             box-sizing: border-box;
         }
-
-        /* Table Styling */
         #data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             table-layout: fixed;
         }
-
         th, td {
             border: 1px solid #000;
-            padding: 12px;
-            font-size: 1.1em;
+            padding: 6px; /* הקטנת גובה תא */
+            font-size: 1.1em; /* הגדלת פונט */
             text-align: center;
-            white-space: nowrap;
             overflow: hidden;
+            white-space: nowrap;
             text-overflow: ellipsis;
         }
-
         .received {
             background-color: yellow;
         }
-
-        /* Action Buttons Layout */
-        .action-cell {
+        .action-buttons {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             gap: 5px;
         }
-
-        .name-input {
-            width: 100%;
-            margin-bottom: 5px;
-            padding: 8px;
-            font-size: 1em;
-            box-sizing: border-box;
+        .autocomplete-suggestions {
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 1000;
+            width: calc(100% - 40px);
         }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            width: 100%;
+        .autocomplete-suggestions div {
+            padding: 10px;
+            cursor: pointer;
         }
-
-        .action-buttons input[type="submit"],
-        .action-buttons button {
-            width: 48%;
-            padding: 8px;
-            font-size: 0.9em;
+        .autocomplete-suggestions div:hover {
+            background-color: #f0f0f0;
         }
-
-        /* Footer Styling */
+        .highlighted {
+            background-color: #ffeb3b;
+        }
         .footer {
             margin-top: 20px;
             font-size: 1em;
             color: #555;
         }
-
-        /* Responsive Adjustments for Smaller Screens */
+        /* עיצוב רספונסיבי למסכים קטנים */
         @media (max-width: 600px) {
             .container {
-                width: 100%;
-                padding: 10px;
+                width: 95%;
+                padding: 5px;
+                box-shadow: none;
             }
             .logo {
                 width: 60%;
@@ -119,16 +101,18 @@
             h1 {
                 font-size: 1.5em;
             }
-            th, td {
-                padding: 10px;
+            input[type="text"], input[type="submit"], button {
+                font-size: 12px;
+                padding: 6px;
+                margin: 3px;
+                width: 100%; /* הכפתורים ימלאו את הרוחב במובייל */
+            }
+            #data-table th, #data-table td {
                 font-size: 1em;
+                padding: 8px;
             }
-            .name-input {
-                width: 100%;
-            }
-            .action-buttons input[type="submit"],
-            .action-buttons button {
-                width: 48%;
+            .footer {
+                font-size: 0.8em;
             }
         }
     </style>
