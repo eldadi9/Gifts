@@ -18,40 +18,51 @@
             padding: 10px 0;
         }
         .logo {
-            width: 300px;
+            width: 200px;
             display: block;
             margin: 0 auto;
         }
         .container {
-            max-width: 800px;
+            max-width: 90%;
             margin: auto;
             padding: 15px;
             background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 4px 50px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
         }
         h1 {
-            font-size: 2.5em;
+            font-size: 2em;
             margin: 10px 0;
         }
         input[type="text"], input[type="submit"], button {
-            font-size: 16px;
-            padding: 10px;
-            margin: 10px;
-            width: calc(100% - 40px);
+            font-size: 14px;
+            padding: 5px; /* ריווח פנימי */
+            margin: 2px;
+            box-sizing: border-box;
         }
-        table {
+        #data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
+            table-layout: fixed;
         }
         th, td {
             border: 1px solid #000;
-            padding: 8px;
-            font-size: 1.2em;
+            padding: 6px; /* הקטנת גובה תא */
+            font-size: 1.1em; /* הגדלת פונט */
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
         .received {
             background-color: yellow;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
         .autocomplete-suggestions {
             border: 1px solid #e0e0e0;
@@ -73,30 +84,35 @@
             background-color: #ffeb3b;
         }
         .footer {
-            margin-top: 25px;
-            font-size: 1.4em;
+            margin-top: 20px;
+            font-size: 1em;
             color: #555;
         }
+        /* עיצוב רספונסיבי למסכים קטנים */
         @media (max-width: 600px) {
-            .header, .container {
-                width: 100%;
+            .container {
+                width: 95%;
                 padding: 5px;
                 box-shadow: none;
             }
             .logo {
-                width: 70%;
+                width: 60%;
             }
             h1 {
                 font-size: 1.5em;
             }
             input[type="text"], input[type="submit"], button {
-                font-size: 14px;
+                font-size: 12px;
+                padding: 6px;
+                margin: 3px;
+                width: 100%; /* הכפתורים ימלאו את הרוחב במובייל */
+            }
+            #data-table th, #data-table td {
+                font-size: 1em;
                 padding: 8px;
-                margin: 5px 0;
-                width: auto;
             }
             .footer {
-                font-size: 1em;
+                font-size: 0.8em;
             }
         }
     </style>
@@ -107,16 +123,16 @@
     </div>
     <div class="container">
         <h1>Employee Gift List</h1>
-        <form action="/view" method="get" style="width: 100%;">
-            <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus>
-            <input type="submit" value="Search">
+        <form action="/view" method="get" style="width: 100%; margin-bottom: 10px;">
+            <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus style="width: calc(100% - 20px); padding: 10px;">
+            <input type="submit" value="Search" style="width: 100%; padding: 10px;">
             <div id="autocomplete-list" class="autocomplete-suggestions"></div>
         </form>
-        <div id="total-received" style="padding: 15px; border: 2px solid #000; border-radius: 5px;font-size: 20px; width: 100%;">
+        <div id="total-received" style="padding: 10px; border: 1px solid #000; border-radius: 5px;font-size: 1.2em; width: 100%; margin-bottom: 15px;">
             סה"כ מתנות התקבלו: {{ total_received }}
         </div>
-        <form action="/save" method="post" style="width: 100%;">
-            <button type="submit" id="save-button" style="width: 100%; padding: 15px; font-size: 20px;">Save Excel</button>
+        <form action="/save" method="post" style="width: 100%; margin-bottom: 15px;">
+            <button type="submit" id="save-button" style="width: 100%; padding: 10px; font-size: 1.2em;">Save Excel</button>
         </form>
         <table border="1" id="data-table">
             <thead>
@@ -134,20 +150,21 @@
             <td>{{ item }}</td>
         {% endfor %}
         <td>
-            <form action="/mark_received" method="post" style="display: inline;">
-                <input type="hidden" name="row_index" value="{{ row.index }}">
-                <input type="submit" value="קיבל מתנה">
-            </form>
-            <form action="/mark_taken" method="post" style="display: inline;">
-                <input type="hidden" name="row_index" value="{{ row.index }}">
-                <input type="text" name="taken_by" placeholder="הכנס שם" style="margin-right: 5px;">
-                <button type="submit">נלקח על ידי</button>
-            </form>
+            <div class="action-buttons">
+                <form action="/mark_received" method="post" style="display: inline;">
+                    <input type="hidden" name="row_index" value="{{ row.index }}">
+                    <input type="submit" value="קיבל מתנה" style="padding: 4px 8px; font-size: 0.9em;">
+                </form>
+                <form action="/mark_taken" method="post" style="display: inline;">
+                    <input type="hidden" name="row_index" value="{{ row.index }}">
+                    <input type="text" name="taken_by" placeholder="הכנס שם" style="width: 80px; padding: 4px; font-size: 0.9em;">
+                    <button type="submit" style="padding: 4px 8px; font-size: 0.9em;">נלקח על ידי</button>
+                </form>
+            </div>
         </td>
     </tr>
     {% endfor %}
 </tbody>
-
         </table>
         <div class="footer">
             Creator: EG - Eldadg1@verifone.com
