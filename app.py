@@ -14,6 +14,7 @@ excel_data = None
 @app.route('/')
 def index():
     return render_template('index.html')
+@app.route('/upload', methods=['POST'])
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -35,6 +36,10 @@ def upload_file():
             excel_data['First Name'] = excel_data['First Name'].astype(str).str.lower()
             excel_data['Last Name'] = excel_data['Last Name'].astype(str).str.lower()
 
+        # הפיכת הערכים בעמודות 'Taken By' ל- "" אם הם מכילים "No" או הם ריקים
+        if 'Taken By' in excel_data.columns:
+            excel_data['Taken By'] = excel_data['Taken By'].replace(['No', 'no', pd.NA, None], '')
+
         return redirect(url_for('view_data'))
     flash('Invalid file format. Please upload an Excel file.')
     return redirect(url_for('index'))
@@ -46,6 +51,7 @@ def view_data():
         flash('No file uploaded.')
         return redirect(url_for('index'))
 
+    # הגדרת חיפוש
     search_query = request.args.get('search', '')
     if search_query:
         search_terms = search_query.lower().split()
@@ -57,15 +63,21 @@ def view_data():
         filtered_data = excel_data
         row_indices = filtered_data.index.tolist()
 
+    # הגדרה מחדש של עמודת 'Taken By' כך שהערכים "No" יוחלפו בריק
+    if 'Taken By' in filtered_data.columns:
+        filtered_data['Taken By'] = filtered_data['Taken By'].replace('No', '')
+
     headers = filtered_data.columns.tolist()
     rows = filtered_data.values.tolist()
 
-    # Combine rows and indices
+    # שילוב אינדקסים ושורות
     rows_with_indices = [{'data': row, 'index': idx} for row, idx in zip(rows, row_indices)]
 
     total_received = (excel_data['Received'] == 'Yes').sum() if 'Received' in excel_data.columns else 0
 
     return render_template('view.html', headers=headers, rows=rows_with_indices, search_query=search_query, total_received=total_received)
+
+
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
