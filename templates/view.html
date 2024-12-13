@@ -66,6 +66,22 @@
             align-items: center;
             gap: 8px;
         }
+         /* CSS for the Undo button */
+        .btn-undo {
+            background-color: red;          /* Red background */
+            color: white;                   /* White text */
+            border: none;                   /* No border */
+            padding: 10px 20px;             /* Padding around the text */
+            text-decoration: none;         /* No underline */
+            font-size: 16px;                /* Font size */
+            border-radius: 5px;             /* Rounded corners */
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
+        }
+
+        .btn-undo:hover {
+            background-color: darkred;      /* Darker red when hovered */
+        }
+
         .autocomplete-suggestions {
             border: 1px solid #e0e0e0;
             background-color: #67eec5;
@@ -119,7 +135,7 @@
             }
             .footer {
                 font-size: 0.8em;
-            }
+
         }
     </style>
 </head>
@@ -142,8 +158,9 @@
 
         </form>
         <div style="margin-bottom: 15px;">
-            <a href="{{ url_for('undo_action') }}" class="btn btn-warning">Undo Last Action</a>
+    <a href="{{ url_for('undo_action') }}" class="btn-undo">Undo</a>
         </div>
+
         <div id="total-received" style="padding: 5px; border: 1px solid #000; border-radius: 8px;font-size: 1.8em; width: 99%; margin-bottom: 15px;">
             סה"כ מתנות התקבלו: {{ total_received }}
         </div>
