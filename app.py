@@ -11,6 +11,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # משתנה גלובלי לשמירת האקסל
 excel_data = None
 
+# Initialize the change history list for undo functionality
+change_history = []
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -102,50 +105,6 @@ def autocomplete():
 
     return jsonify(names)
 
-@app.route('/mark_received', methods=['POST'])
-def mark_received():
-    global excel_data
-    if excel_data is None:
-        flash('No file uploaded.')
-        return redirect(url_for('index'))
-
-    row_index = int(request.form['row_index'])
-    if 'Received' not in excel_data.columns:
-        excel_data['Received'] = ''
-
-    if excel_data.at[row_index, 'Received'] == 'Yes':
-        flash(f"Error: {excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} already received a gift.")
-    else:
-        excel_data.at[row_index, 'Received'] = 'Yes'
-        flash(f"{excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} marked as received.")
-
-    return redirect(url_for('view_data'))
-
-@app.route('/mark_taken', methods=['POST'])
-def mark_taken():
-    global excel_data
-    if excel_data is None:
-        flash('No file uploaded.')
-        return redirect(url_for('index'))
-
-    row_index = int(request.form['row_index'])
-    taken_by = request.form['taken_by']  # השם שהוזן
-
-    # הוספת עמודת 'Taken By' במידת הצורך
-    if 'Taken By' not in excel_data.columns:
-        excel_data['Taken By'] = ''
-
-    if 'Received' not in excel_data.columns:
-        excel_data['Received'] = ''
-
-    if excel_data.at[row_index, 'Received'] == 'Yes':
-        flash(f"Error: {excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} already received a gift.")
-    else:
-        excel_data.at[row_index, 'Received'] = 'Yes'
-        excel_data.at[row_index, 'Taken By'] = taken_by  # שמירת השם
-        flash(f"{excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} marked as taken by {taken_by}.")
-
-    return redirect(url_for('view_data'))
 
 @app.route('/save', methods=['POST'])
 def save_file():
@@ -158,6 +117,60 @@ def save_file():
     excel_data.to_excel(save_path, index=False)
     flash('File saved successfully.')
     return send_file(save_path, as_attachment=True)
+
+@app.route('/mark_received', methods=['POST'])
+def mark_received():
+    global excel_data, change_history
+    row_index = int(request.form['row_index'])
+    if 'Received' not in excel_data.columns:
+        excel_data['Received'] = ''
+    excel_data.at[row_index, 'Received'] = 'Yes'
+    change_history.append(('received', row_index, 'No'))  # Assuming 'No' is the previous value
+    flash('Gift marked as received.')
+    return redirect(url_for('view_data'))
+
+@app.route('/mark_taken', methods=['POST'])
+def mark_taken():
+    global excel_data, change_history
+    row_index = int(request.form['row_index'])
+    taken_by = request.form['taken_by'].strip()  # Trim any whitespace from the name
+
+    if 'Taken By' not in excel_data.columns:
+        excel_data['Taken By'] = ''
+    if 'Received' not in excel_data.columns:
+        excel_data['Received'] = ''
+
+    previous_taken_by = excel_data.at[row_index, 'Taken By']
+    previous_received = excel_data.at[row_index, 'Received']
+
+    # Update the record
+    excel_data.at[row_index, 'Taken By'] = taken_by
+    excel_data.at[row_index, 'Received'] = 'Yes'
+
+    # Record the change for undo functionality
+    change_history.append(('taken_and_received', row_index, (previous_taken_by, previous_received)))
+
+    flash(f"Gift for {excel_data.iloc[row_index]['First Name']} {excel_data.iloc[row_index]['Last Name']} marked as taken by {taken_by} and received.")
+    return redirect(url_for('view_data'))
+
+@app.route('/undo_action', methods=['GET'])
+def undo_action():
+    global excel_data, change_history
+    if not change_history:
+        flash('No actions to undo.')
+        return redirect(url_for('view_data'))
+
+    last_action = change_history.pop()
+    action_type, row_index, previous_values = last_action
+
+    if action_type == 'received' or action_type == 'taken_and_received':
+        excel_data.at[row_index, 'Received'] = previous_values[1]  # Restore previous 'Received' status
+        if action_type == 'taken_and_received':
+            excel_data.at[row_index, 'Taken By'] = previous_values[0]  # Restore previous 'Taken By' status
+
+    flash('Last action has been undone.')
+    return redirect(url_for('view_data'))
+
 
 if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):

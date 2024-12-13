@@ -133,7 +133,17 @@
             <input type="text" id="search-input" name="search" placeholder="Search by name" autofocus style="width: calc(100% - 5px); padding: 10px;">
             <input type="submit" value="Search" style="width: 100%; padding: 11px;">
             <div id="autocomplete-list" class="autocomplete-suggestions"></div>
+            <form action="{{ url_for('mark_received') }}" method="post" style="display: inline;">
+    <!-- Form Contents -->
+</form>
+<form action="{{ url_for('mark_taken') }}" method="post" style="display: inline;">
+    <!-- Form Contents -->
+</form>
+
         </form>
+        <div style="margin-bottom: 15px;">
+            <a href="{{ url_for('undo_action') }}" class="btn btn-warning">Undo Last Action</a>
+        </div>
         <div id="total-received" style="padding: 5px; border: 1px solid #000; border-radius: 8px;font-size: 1.8em; width: 99%; margin-bottom: 15px;">
             סה"כ מתנות התקבלו: {{ total_received }}
         </div>
